@@ -34,9 +34,24 @@ def init_db():
         edge_cols={r['name'] for r in c.execute('PRAGMA table_info(graph_edges)').fetchall()}
         if 'confidence' not in edge_cols: c.execute('ALTER TABLE graph_edges ADD COLUMN confidence REAL DEFAULT 1.0')
         if 'evidence' not in edge_cols: c.execute('ALTER TABLE graph_edges ADD COLUMN evidence TEXT')
-        if not c.execute('SELECT 1 FROM users LIMIT 1').fetchone():
-            pwd=os.getenv('ADMIN_PASSWORD','admin123!')
-            c.execute('INSERT INTO users(email,name,role,password_hash) VALUES (?,?,?,?)',('admin@unigraph.local','Administrator','admin',_hash(pwd)))
+        # Sync Admin credentials from environment variables
+        admin_pwd = os.getenv('ADMIN_PASSWORD', 'admin123!').strip()
+        custom_email = os.getenv('ADMIN_EMAIL', '').strip().lower()
+        
+        # 1. Maintain admin@unigraph.local
+        admin_local = c.execute("SELECT id FROM users WHERE lower(email)='admin@unigraph.local'").fetchone()
+        if admin_local:
+            c.execute('UPDATE users SET password_hash=?, active=1, role=? WHERE id=?', (_hash(admin_pwd), 'admin', admin_local['id']))
+        else:
+            c.execute('INSERT INTO users(email,name,role,password_hash) VALUES (?,?,?,?)', ('admin@unigraph.local', 'Administrator', 'admin', _hash(admin_pwd)))
+
+        # 2. If a custom ADMIN_EMAIL is provided, sync that user too
+        if custom_email and custom_email != 'admin@unigraph.local':
+            custom_user = c.execute('SELECT id FROM users WHERE lower(email)=?', (custom_email,)).fetchone()
+            if custom_user:
+                c.execute('UPDATE users SET password_hash=?, active=1, role=? WHERE id=?', (_hash(admin_pwd), 'admin', custom_user['id']))
+            else:
+                c.execute('INSERT INTO users(email,name,role,password_hash) VALUES (?,?,?,?)', (custom_email, 'Administrator', 'admin', _hash(admin_pwd)))
 
 def log(action, detail='', sku=None, actor='system', ip=None):
     with conn() as c: c.execute('INSERT INTO audit_log(sku,actor,action,detail,ip) VALUES (?,?,?,?,?)',(sku,actor,action,detail,ip))

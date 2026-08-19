@@ -44,6 +44,16 @@ app.add_middleware(SecurityHeaders)
 @app.on_event('startup')
 def startup():
     db.init_db()
+    with db.conn() as c:
+        p_count = c.execute('SELECT COUNT(*) n FROM products').fetchone()['n']
+        if p_count == 0:
+            try:
+                from .services import catalog_ai
+                from seed_demo import seed_catalog
+                seed_catalog()
+                print("Auto-seeded catalog demo products on initial deployment.")
+            except Exception as e:
+                print(f"Startup seed notice: {e}")
 
 def actor(request: Request):
     auth = request.headers.get('Authorization', '')
