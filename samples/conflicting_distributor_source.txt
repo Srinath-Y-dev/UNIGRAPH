@@ -1,0 +1,7 @@
+Authorized distributor listing
+Model: LC1D18M7-DEMO
+Current Rating: 18 A
+Coil Voltage: 230 VAC
+Mounting Type: DIN Rail
+CE
+This intentionally conflicts with the synthetic manufacturer sample to demonstrate conflict intelligence.

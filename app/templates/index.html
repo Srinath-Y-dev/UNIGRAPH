@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UniGraph IQ Enterprise — Autonomous Product Intelligence</title>
+  <meta name="description" content="UniGraph IQ turns fragmented product data into verified commerce intelligence. Extract, normalize, validate and publish industrial product information at enterprise scale." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/static/app.css" />
+</head>
+<body data-theme="dark">
+<div class="shell">
+
+  <!-- ======================================================
+       TOP NAVIGATION
+       ====================================================== -->
+  <nav class="topnav" role="navigation" aria-label="Main navigation">
+    <div class="topnav-inner">
+      <!-- Brand -->
+      <a class="brand" href="/" aria-label="UniGraph IQ home" onclick="event.preventDefault();showView('dashboard')">
+        <div class="brand-mark" aria-hidden="true">U</div>
+        <div class="brand-name">
+          <strong>UniGraph IQ</strong>
+          <span>Enterprise Intelligence</span>
+        </div>
+      </a>
+
+      <!-- Primary Nav Links -->
+      <div class="topnav-links" role="menubar">
+        <button class="nav active" data-view="dashboard" role="menuitem" aria-current="page" onclick="showView('dashboard')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+          Command Center
+        </button>
+        <button class="nav" data-view="enrich" role="menuitem" onclick="showView('enrich')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3l2 2" stroke-linecap="round"/></svg>
+          Enrich Product
+        </button>
+        <button class="nav" data-view="catalog" role="menuitem" onclick="showView('catalog')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="1" y="1" width="14" height="3" rx="1"/><rect x="1" y="6" width="14" height="3" rx="1"/><rect x="1" y="11" width="14" height="3" rx="1"/></svg>
+          Catalog
+        </button>
+        <button class="nav" data-view="compare" role="menuitem" onclick="showView('compare')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 14V2M12 14V2M1 6h6M9 10h6"/></svg>
+          Compare &amp; Matrix
+        </button>
+        <button class="nav" data-view="review" role="menuitem" onclick="showView('review')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 1.5L9.8 5.6l4.4.64-3.2 3.12.76 4.4L8 11.6l-3.76 2.16.76-4.4L1.8 6.24l4.4-.64Z" stroke-linejoin="round"/></svg>
+          Review Queue
+        </button>
+        <button class="nav" data-view="copilot" role="menuitem" onclick="showView('copilot')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M13 9c0 2.21-2.24 4-5 4a5.7 5.7 0 0 1-2.12-.4L2 14l1.08-3.36A4.11 4.11 0 0 1 3 9c0-2.21 2.24-4 5-4s5 1.79 5 4Z"/></svg>
+          Catalog Copilot
+        </button>
+        <button class="nav" data-view="operations" role="menuitem" onclick="showView('operations')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 8A6 6 0 1 1 8 2" stroke-linecap="round"/><path d="M14 2v4h-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Operations
+        </button>
+        <button class="nav" data-view="enterprise" role="menuitem" onclick="showView('enterprise')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 13V6l6-4 6 4v7" stroke-linecap="round" stroke-linejoin="round"/><rect x="6" y="9" width="4" height="4" rx="0.5"/></svg>
+          Enterprise &amp; PIM
+        </button>
+        <button class="nav admin-nav" data-view="admin" role="menuitem" style="display:none" aria-label="Admin panel" onclick="showView('admin')">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.31 2.69-5 6-5s6 1.69 6 5" stroke-linecap="round"/></svg>
+          Admin
+        </button>
+      </div>
+
+      <!-- Theme Switcher & Status -->
+      <div class="nav-status" aria-label="System status">
+        <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle Theme" aria-label="Toggle light/dark theme">
+          <svg class="sun-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+        <div class="status-dot" aria-hidden="true"></div>
+        <span>AI Engine: Active</span>
+      </div>
+
+      <!-- Top actions -->
+      <div class="top-actions">
+        <button class="button ghost sm" id="auth-button" onclick="openLogin()">Sign in</button>
+        <button class="button sm" onclick="showView('enrich')">+ Enrich Product</button>
+      </div>
+
+      <!-- Mobile burger -->
+      <button class="mobile-nav" id="burger-btn" aria-label="Open navigation" aria-expanded="false" onclick="toggleMobileNav()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile nav menu -->
+  <div id="mobile-nav-menu" class="mobile-nav-menu" style="display:none" role="navigation" aria-label="Mobile navigation">
+    <button class="nav" data-view="dashboard" onclick="showView('dashboard');closeMobileNav()">Command Center</button>
+    <button class="nav" data-view="enrich" onclick="showView('enrich');closeMobileNav()">Enrich Product</button>
+    <button class="nav" data-view="catalog" onclick="showView('catalog');closeMobileNav()">Catalog</button>
+    <button class="nav" data-view="compare" onclick="showView('compare');closeMobileNav()">Compare &amp; Matrix</button>
+    <button class="nav" data-view="review" onclick="showView('review');closeMobileNav()">Review Queue</button>
+    <button class="nav" data-view="copilot" onclick="showView('copilot');closeMobileNav()">Catalog Copilot</button>
+    <button class="nav" data-view="operations" onclick="showView('operations');closeMobileNav()">Operations</button>
+    <button class="nav" data-view="enterprise" onclick="showView('enterprise');closeMobileNav()">Enterprise &amp; PIM</button>
+    <button class="nav admin-nav mobile-admin-nav" data-view="admin" style="display:none" onclick="showView('admin');closeMobileNav()">Admin</button>
+  </div>
+
+  <!-- ======================================================
+       MAIN CONTENT
+       ====================================================== -->
+  <main id="main-content">
+
+    <!-- ======================== DASHBOARD ======================== -->
+    <section id="view-dashboard" class="view active" aria-labelledby="page-title" role="main">
+      <div class="page-header" data-reveal>
+        <div class="page-header-left">
+          <p class="eyebrow">Autonomous Product Intelligence Suite</p>
+          <h1 class="page-title" id="page-title">Command Center</h1>
+          <p class="page-subtitle">Golden Records, provenance graphs, confidence telemetry, and syndication gates.</p>
+        </div>
+        <div class="top-actions" style="margin-top:0">
+          <button class="button ghost sm" onclick="showView('compare')">Cross-Reference Matrix</button>
+          <button class="button ghost sm" onclick="showView('review')">Review Queue</button>
+          <button class="button sm" onclick="showView('enrich')">+ Enrich Product</button>
+        </div>
+      </div>
+
+      <!-- Hero Banner -->
+      <div class="card hero" data-reveal style="--reveal-delay:60ms">
+        <div class="hero-text">
+          <span class="pill" aria-label="Feature tag">DIGITAL PRODUCT TWIN &amp; GRAPH RAG</span>
+          <h2>Automate B2B Catalog Intelligence with Deterministic Provenance.</h2>
+          <p>Extract technical parameters, normalize units, resolve conflicting distributor datasheets, and publish verified Golden Records to CX1, ERP, and e-Commerce channels.</p>
+          <div class="hero-actions">
+            <button class="button" onclick="showView('enrich')">Start Single Enrichment</button>
+            <button class="button ghost" onclick="showView('operations')">Run Bulk CSV Job</button>
+            <button class="button ghost" onclick="showView('catalog')">Browse Golden Catalog</button>
+          </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="orb">
+            <div class="orb-inner">IQ</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stat Band -->
+      <div class="metrics" id="metrics" aria-label="Key metrics" data-reveal style="--reveal-delay:120ms"></div>
+
+      <!-- Visual Analytics Row (Charts) -->
+      <div class="grid two" data-reveal style="--reveal-delay:160ms">
+        <article class="card">
+          <div class="section-head">
+            <div>
+              <span class="kicker">Category Distribution</span>
+              <h3>Catalog Taxonomy Breakdown</h3>
+            </div>
+          </div>
+          <div id="chart-categories" class="chart-container" aria-label="Category distribution chart"></div>
+        </article>
+        <article class="card">
+          <div class="section-head">
+            <div>
+              <span class="kicker">Quality Governance</span>
+              <h3>Completeness &amp; Readiness Distribution</h3>
+            </div>
+          </div>
+          <div id="chart-completeness" class="chart-container" aria-label="Completeness distribution chart"></div>
+        </article>
+      </div>
+
+      <!-- Two-column cards -->
+      <div class="grid two" data-reveal style="--reveal-delay:200ms">
+        <article class="card">
+          <div class="section-head">
+            <div>
+              <span class="kicker">Portfolio Health</span>
+              <h3>Product Intelligence Quality</h3>
+            </div>
+            <span id="health-score" class="score-chip" aria-live="polite">0%</span>
+          </div>
+          <div id="health-bars"></div>
+        </article>
+        <article class="card">
+          <div class="section-head">
+            <div>
+              <span class="kicker">QA Guardian</span>
+              <h3>Attention Required &amp; Conflicts</h3>
+            </div>
+          </div>
+          <div id="attention" aria-live="polite"></div>
+        </article>
+      </div>
+
+      <!-- Recent Products Table -->
+      <article class="card" data-reveal style="--reveal-delay:240ms">
+        <div class="section-head">
+          <div>
+            <span class="kicker">Live Catalog</span>
+            <h3>Recently Enriched Golden Records</h3>
+          </div>
+          <button class="text-btn" onclick="showView('catalog')">View all products →</button>
+        </div>
+        <div class="table-wrap">
+          <table aria-label="Recent products">
+            <thead>
+              <tr>
+                <th scope="col">Product / SKU</th>
+                <th scope="col">Category</th>
+                <th scope="col">Taxonomy</th>
+                <th scope="col">IQ Score</th>
+                <th scope="col">Commerce</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="recent-products"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <!-- ======================== ENRICH ======================== -->
+    <section id="view-enrich" class="view" aria-labelledby="enrich-title">
+      <div class="page-header" data-reveal>
+        <div class="page-header-left">
+          <p class="eyebrow">Autonomous Ingestion Pipeline</p>
+          <h1 class="page-title" id="enrich-title">Enrich a Product</h1>
+          <p class="page-subtitle">Start with partial identity, raw technical text, or multi-format source attachments.</p>
+        </div>
+      </div>
+      <div class="form-layout" data-reveal>
+        <article class="card">
+          <form id="enrich-form" novalidate>
+            <div class="field-row">
+              <label for="enrich-sku">SKU / Item Identifier <input id="enrich-sku" name="sku" required placeholder="e.g. 3RT2015-1AP01"></label>
+              <label for="enrich-mfr">Manufacturer <input id="enrich-mfr" name="manufacturer" placeholder="e.g. Siemens"></label>
+            </div>
+            <div class="field-row">
+              <label for="enrich-mpn">Manufacturer Part Number (MPN) <input id="enrich-mpn" name="mpn" placeholder="e.g. 3RT2015-1AP01"></label>
+              <label for="enrich-src">Source Authority Level
+                <select id="enrich-src" name="source_type">
+                  <option value="manufacturer_datasheet">Manufacturer datasheet (100% authority)</option>
+                  <option value="manufacturer_website">Manufacturer website (94% authority)</option>
+                  <option value="certified_database">Certified database (90% authority)</option>
+                  <option value="authorized_distributor">Authorized distributor (82% authority)</option>
+                  <option value="customer_catalog">Customer catalog (72% authority)</option>
+                  <option value="user_input">Manual user input (80% authority)</option>
+                </select>
+              </label>
+            </div>
+            <label for="enrich-text">Product Technical Specifications / Catalog Description
+              <textarea id="enrich-text" name="product_text" rows="8" placeholder="Paste unformatted technical specs, table text, or product page text..."></textarea>
+            </label>
+            <label class="dropzone" for="enrich-files">
+              Attach Source Evidence Documents
+              <input id="enrich-files" type="file" name="files" multiple accept=".pdf,.txt,.md,.csv,.xlsx,.xlsm,.png,.jpg,.jpeg">
+              <span>PDF · TXT · CSV · XLSX · Technical Datasheets</span>
+            </label>
+            <button class="button wide" type="submit">Run Autonomous Intelligence Pipeline</button>
+          </form>
+        </article>
+        <article class="card pipeline-card">
+          <span class="kicker">Deterministic Architecture</span>
+          <h3 style="margin-bottom:0">Pipeline Agent Chain</h3>
+          <div class="pipeline" aria-label="AI pipeline steps">
+            <div><b>01</b><span><strong>Identity Resolution</strong><small>MPN &amp; Manufacturer canonicalization</small></span></div>
+            <div><b>02</b><span><strong>Document RAG Extraction</strong><small>Extract dimensional &amp; electrical attributes</small></span></div>
+            <div><b>03</b><span><strong>ETIM / UNSPSC Classifier</strong><small>Dynamic schema and taxonomy assignment</small></span></div>
+            <div><b>04</b><span><strong>Unit Normalization Engine</strong><small>Metric / imperial standard conversions</small></span></div>
+            <div><b>05</b><span><strong>QA Guardian Conflict Engine</strong><small>Cross-source authority voting &amp; confidence</small></span></div>
+            <div><b>06</b><span><strong>Commerce Copy Generation</strong><small>Structured descriptions &amp; search keywords</small></span></div>
+            <div><b>07</b><span><strong>Knowledge Graph Edges</strong><small>Product family, similarity &amp; spec clusters</small></span></div>
+            <div><b>08</b><span><strong>Golden Record &amp; Syndication</strong><small>PIM, Shopify &amp; Schema.org ready outputs</small></span></div>
+          </div>
+        </article>
+      </div>
+      <div id="enrich-result"></div>
+    </section>
+
+    <!-- ======================== CATALOG ======================== -->
+    <section id="view-catalog" class="view" aria-labelledby="catalog-title">
+      <div class="page-header" data-reveal>
+        <div class="page-header-left">
+          <p class="eyebrow">Enterprise Golden Product Master</p>
+          <h1 class="page-title" id="catalog-title">Industrial Catalog</h1>
+          <p class="page-subtitle">Search, filter, inspect provenance graphs, and export to syndication channels.</p>
+        </div>
+        <div class="top-actions" style="margin-top:0">
+          <button class="button ghost sm" onclick="exportCatalogCsv()">Export Master CSV</button>
+          <button class="button sm" onclick="showView('enrich')">+ Add Product</button>
+        </div>
+      </div>
+
+      <div class="catalog-layout" data-reveal>
+        <!-- Facet Sidebar -->
+        <aside class="catalog-sidebar card">
+          <div class="sidebar-header">
+            <h3>Filters &amp; Facets</h3>
+            <button class="text-btn" onclick="resetCatalogFilters()" style="font-size:12px">Reset</button>
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label" for="filter-category">Category</label>
+            <select id="filter-category" onchange="renderCatalog()">
+              <option value="">All Categories</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label" for="filter-status">Publish Status</label>
+            <select id="filter-status" onchange="renderCatalog()">
+              <option value="">All Statuses</option>
+              <option value="READY_TO_PUBLISH">Ready to Publish</option>
+              <option value="REVIEW_REQUIRED">Review Required</option>
+              <option value="INSUFFICIENT_DATA">Insufficient Data</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label" for="filter-mfr">Manufacturer</label>
+            <select id="filter-mfr" onchange="renderCatalog()">
+              <option value="">All Manufacturers</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label" for="filter-completeness">Min Completeness: <strong id="completeness-val">0%</strong></label>
+            <input type="range" id="filter-completeness" min="0" max="100" value="0" step="5" oninput="$('#completeness-val').textContent=this.value+'%'; renderCatalog()">
+          </div>
+
+          <div class="filter-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="filter-conflicts-only" onchange="renderCatalog()">
+              <span>Show conflicts only</span>
+            </label>
+          </div>
+        </aside>
+
+        <!-- Catalog Main Area -->
+        <div class="catalog-main">
+          <article class="card">
+            <div class="section-head">
+              <div class="search-wrap">
+                <input id="catalog-search" class="search" type="search" placeholder="Search SKU, MPN, manufacturer, specs…" oninput="renderCatalog()" aria-label="Search catalog">
+              </div>
+              <div class="catalog-count-pill" id="catalog-count">Showing 0 products</div>
+            </div>
+
+            <div class="table-wrap">
+              <table aria-label="Product catalog" class="catalog-table">
+                <thead>
+                  <tr>
+                    <th scope="col" style="width:40px">
+                      <input type="checkbox" id="select-all-compare" title="Select for comparison" onchange="toggleSelectAllCompare(this.checked)">
+                    </th>
+                    <th scope="col">Product / Identity</th>
+                    <th scope="col">Category &amp; Taxonomy</th>
+                    <th scope="col">Completeness</th>
+                    <th scope="col">IQ Score</th>
+                    <th scope="col">Commerce</th>
+                    <th scope="col">QA Status</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="catalog-body"></tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- Compare Floating Bar -->
+      <div id="compare-bar" class="compare-bar" style="display:none">
+        <div class="compare-bar-content">
+          <div class="compare-bar-info">
+            <strong id="compare-selected-count">0</strong> products selected for side-by-side comparison
+          </div>
+          <div class="compare-bar-actions">
+            <button class="button ghost sm" onclick="clearCompareSelection()">Clear</button>
+            <button class="button sm" onclick="launchCompareFromBar()">Launch Cross-Reference Matrix →</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="product-detail"></div>
+    </section>
+
+    <!-- ======================== COMPARE VIEW ======================== -->
+    <section id="view-compare" class="view" aria-labelledby="compare-title">
+      <div class="page-header" data-reveal>
+        <div class="page-header-left">
+          <p class="eyebrow">Cross-Reference &amp; Competitor Matrix</p>
+          <h1 class="page-title" id="compare-title">Side-by-Side Product Comparison</h1>
+          <p class="page-subtitle">Compare technical specifications, detect variances, and score drop-in replacement substitutes.</p>
+        </div>
+      </div>
+
+      <article class="card" data-reveal style="margin-bottom:var(--sp-4)">
+        <div class="section-head">
+          <div>
+            <span class="kicker">Product Selection</span>
+            <h3>Select 2 to 4 Products to Cross-Reference</h3>
+          </div>
+        </div>
+        <div class="compare-picker" id="compare-picker">
+          <!-- Multi select dropdown or search chips -->
+          <div id="compare-chips" class="compare-chips"></div>
+          <div class="compare-add-wrap">
+            <select id="compare-add-select" onchange="addCompareSku(this.value); this.value=''">
+              <option value="">+ Add product to comparison matrix...</option>
+            </select>
+          </div>
+        </div>
+      </article>
+
+      <div id="compare-matrix-container"></div>
+    </section>
+
+    <!-- ======================== REVIEW QUEUE ======================== -->
+    <section id="view-review" class="view" aria-labelledby="review-title">
+      <div class="page-header" data-reveal>
+        <div class="page-header-left">
+          <p class="eyebrow">Human-in-the-Loop Governance</p>
+          <h1 class="page-title" id="review-title">Review &amp; Governance Queue</h1>
+          <p class="page-subtitle">Products flagged by the QA Guardian due to conflicting distributor evidence or low completeness.</p>
+        </div>
+      </div>
+      <article class="card" data-reveal>
+        <div id="review-list" class="review-list" aria-live="polite"></div>
+      </article>
+
+      <!-- Review action modal -->
+      <div id="review-modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="review-modal-heading">
+        <div class="card login-card" style="width:min(540px,100%)">
+          <span class="kicker">Governance Decision</span>
+          <h2 id="review-modal-heading" style="margin:4px 0 12px">Submit Review Decision</h2>
+          <form id="review-modal-form" novalidate>
+            <input type="hidden" id="review-modal-sku">
+            <label for="review-decision">Decision
+              <select id="review-decision" required>
+                <option value="APPROVE">Approve — Mark Golden Record publish-ready</option>
+                <option value="REJECT">Reject — Flag for data rework</option>
+                <option value="COMMENT">Comment Only</option>
+              </select>
+            </label>
+            <label for="review-attribute">Attribute (Optional)
+              <input id="review-attribute" type="text" placeholder="e.g. coil_voltage">
+            </label>
+            <label for="review-comment">Audit Comment / Rationale
+              <textarea id="review-comment" rows="3" placeholder="Provide reason or reference document..."></textarea>
+            </label>
+            <button class="button wide" type="submit">Submit Governance Decision</button>
+          </form>
+          <button class="text-btn" onclick="closeReviewModal()" style="margin-top:var(--sp-3);display:block;width:100%;text-align:center">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================== AI COPILOT ======================== -->
+    <section id="view-copilot" class="view" aria-labelledby="copilot-title">
+      <div class="page-header" data-reveal>
+        <div class="page-header-left">
+          <p class="eyebrow">Conversational Catalog Analytics</p>
+          <h1 class="page-title" id="copilot-title">Ask the Product Graph</h1>
+          <p class="page-subtitle">Natural language queries for attributes, conflicts, publish readiness, and cross-catalog searches.</p>
+        </div>
+      </div>
+      <div class="copilot-grid" data-reveal>
+        <article class="card chat-card">
+          <div id="chat" class="chat" aria-live="polite" aria-label="Copilot conversation">
+            <div class="bubble ai">
+              <strong>Hello! I am your Catalog Intelligence Copilot.</strong><br>
+              Try asking:
+              <ul style="margin:6px 0 0 16px;padding:0">
+                <li><em>"Show products with conflicts"</em></li>
+                <li><em>"What contactors do we have?"</em></li>
+                <li><em>"Which products are ready to publish?"</em></li>
+                <li><em>"Find products by Schneider or Siemens"</em></li>
+                <li><em>"Show lowest completeness items"</em></li>
+              </ul>
+            </div>
+          </div>
+          <form id="copilot-form" class="chat-form">
+            <input id="copilot-input" type="text" placeholder="Ask about specs, manufacturers, readiness, or conflicts…" required aria-label="Copilot question">
+            <button class="button" type="submit">Ask Copilot</button>
+          </form>
+        </article>
+        <article class="card">
+          <span class="kicker">Quick Actions</span>
+          <h3>Suggested Catalog Queries</h3>
+          <div class="suggestions" role="list">
+            <button role="listitem" onclick="askCopilot('show products with conflicts')">⚠️ Show attribute conflicts</button>
+            <button role="listitem" onclick="askCopilot('what is ready to publish?')">🚀 Publish-ready Golden Records</button>
+            <button role="listitem" onclick="askCopilot('show contactors')">⚡ Filter all Contactors</button>
+            <button role="listitem" onclick="askCopilot('show products manufactured by Siemens')">🏢 Siemens product list</button>
+            <button role="listitem" onclick="askCopilot('show incomplete products')">📉 Incomplete records review</button>
+            <button role="listitem" onclick="askCopilot('show source evidence for coil voltage')">🔍 RAG Evidence: Coil Voltage</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ======================== OPERATIONS ======================== -->
+    <section id="view-operations" class="view" aria-labelledby="ops-title">
+      <div class="page-header" data-reveal>
+        <div class="page-header-left">
+          <p class="eyebrow">Enterprise Batch Processing &amp; RAG</p>
+          <h1 class="page-title" id="ops-title">Operations &amp; Bulk Jobs</h1>
+          <p class="page-subtitle">Run governed bulk catalog enrichment and perform full-text search across indexed evidence.</p>
+        </div>
+      </div>
+      <div class="grid two" data-reveal>
+        <article class="card">
+          <span class="kicker">Batch Processing</span>
+          <h2>Bulk Catalog Ingestion</h2>
+          <p class="muted">Upload a customer or distributor CSV (with SKU, MPN, Manufacturer, and specifications). Each row is executed through the governed agent pipeline.</p>
+          <form id="bulk-form">
+            <label class="dropzone" for="bulk-file">
+              Select Catalog CSV
+              <input id="bulk-file" type="file" name="file" accept=".csv" required>
+              <span>CSV · Audited high-throughput processing</span>
+            </label>
+            <button class="button wide" type="submit">Run Bulk Catalog Enrichment</button>
+          </form>
+          <h3 style="margin-top:var(--sp-4)">Job Execution History</h3>
+          <div id="jobs-list" class="review-list" aria-live="polite"></div>
+        </article>
+        <article class="card">
+          <span class="kicker">RAG Evidence Repository</span>
+          <h2>Search Indexed Source Proof</h2>
+          <p class="muted">Retrieve full-text excerpts from manufacturer PDFs, datasheets, and distributor catalogs indexed into the evidence store.</p>
+          <form id="rag-form" class="chat-form" style="margin-top:var(--sp-3)">
+            <input id="rag-input" type="text" placeholder="e.g. coil voltage 220V DIN rail or operating temperature" required aria-label="Evidence search query">
+            <button class="button" type="submit">Search Evidence</button>
+          </form>
+          <div id="rag-results" class="review-list" style="margin-top:var(--sp-3)" aria-live="polite"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ======================== ENTERPRISE & PIM ======================== -->
+    <section id="view-enterprise" class="view" aria-labelledby="enterprise-title">
+      <div class="page-header" data-reveal>
+        <div class="page-header-left">
+          <p class="eyebrow">Enterprise PIM &amp; Syndication</p>
+          <h1 class="page-title" id="enterprise-title">Enterprise Connectors &amp; Governance</h1>
+          <p class="page-subtitle">Configure outbound PIM connectors, monitor webhook dispatches, and review immutable audit logs.</p>
+        </div>
+      </div>
+      <div class="metrics" id="enterprise-metrics" aria-label="Enterprise metrics" data-reveal></div>
+      <div class="grid two" data-reveal>
+        <article class="card">
+          <span class="kicker">Integrations</span>
+          <h2>Connector Registry &amp; Dispatcher</h2>
+          <p class="muted">Live connections to CX1 PIM, SAP S/4HANA ERP, Akeneo, and custom e-Commerce channels.</p>
+          <div id="connector-list" class="review-list" aria-live="polite"></div>
+          <div class="connector-form-wrap">
+            <button class="text-btn" id="toggle-connector-form" onclick="toggleConnectorForm()" style="margin-top:var(--sp-3)">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" width="13" height="13"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+              + Add New Connector
+            </button>
+            <form id="connector-form" class="connector-form" style="display:none" novalidate>
+              <div class="field-row">
+                <label for="conn-name">Connector Name <input id="conn-name" required placeholder="e.g. CX1 Production"></label>
+                <label for="conn-type">Type
+                  <select id="conn-type">
+                    <option value="CX1">CX1 / PIM</option>
+                    <option value="ERP">ERP</option>
+                    <option value="DAM">DAM</option>
+                    <option value="ECOMM">E-Commerce</option>
+                    <option value="CUSTOM">Custom Webhook</option>
+                  </select>
+                </label>
+              </div>
+              <label for="conn-url">Endpoint Base URL <input id="conn-url" type="url" placeholder="https://api.example.com/v1"></label>
+              <label for="conn-status">Status
+                <select id="conn-status">
+                  <option value="ACTIVE">Active</option>
+                  <option value="CONFIGURED">Configured</option>
+                  <option value="DISABLED">Disabled</option>
+                </select>
+              </label>
+              <div style="display:flex;gap:var(--sp-2);margin-top:var(--sp-3)">
+                <button class="button sm" type="submit">Save Connector</button>
+                <button class="button ghost sm" type="button" onclick="toggleConnectorForm()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </article>
+        <article class="card">
+          <span class="kicker">Multi-Channel Syndication</span>
+          <h2>Export Formats</h2>
+          <div class="pipeline" aria-label="Syndication channels">
+            <div><b>CX</b><span><strong>CX1 / Akeneo PIM</strong><small>Hierarchical family JSON payload with ETIM attributes</small></span></div>
+            <div><b>SH</b><span><strong>Shopify / E-Commerce</strong><small>Standard product feed CSV with HTML specification tables</small></span></div>
+            <div><b>LD</b><span><strong>Schema.org / JSON-LD</strong><small>SEO structured product data for B2B search engines</small></span></div>
+            <div><b>PDF</b><span><strong>Printable Product Fact Sheet</strong><small>1-page high-resolution technical data sheet with provenance</small></span></div>
+          </div>
+        </article>
+      </div>
+
+      <article class="card" data-reveal style="margin-top:var(--sp-4)">
+        <span class="kicker">Audit Trail</span>
+        <h3>Recent Enterprise Events &amp; Overrides</h3>
+        <div id="audit-list" class="review-list" aria-live="polite"></div>
+      </article>
+    </section>
+
+    <!-- ======================== ADMIN ======================== -->
+    <section id="view-admin" class="view" aria-labelledby="admin-title">
+      <div class="page-header" data-reveal>
+        <div class="page-header-left">
+          <p class="eyebrow">System Administration</p>
+          <h1 class="page-title" id="admin-title">Admin Panel</h1>
+          <p class="page-subtitle">Manage user accounts, RBAC security roles, and machine integration API keys.</p>
+        </div>
+      </div>
+
+      <article class="card" data-reveal style="margin-bottom:var(--sp-4)">
+        <div class="section-head">
+          <div>
+            <span class="kicker">Access Control</span>
+            <h2 style="font-size:18px;margin-top:4px">Users &amp; Roles</h2>
+          </div>
+          <button class="button sm" onclick="openAddUser()">+ Add User</button>
+        </div>
+        <div class="table-wrap">
+          <table aria-label="Users" class="admin-table">
+            <thead>
+              <tr>
+                <th scope="col">Name / Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Status</th>
+                <th scope="col">Last Login</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-users-body"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card" data-reveal>
+        <div class="section-head">
+          <div>
+            <span class="kicker">Machine-to-Machine Integration</span>
+            <h2 style="font-size:18px;margin-top:4px">API Keys</h2>
+          </div>
+          <button class="button sm" onclick="openGenerateKey()">Generate API Key</button>
+        </div>
+        <div id="key-reveal" class="key-reveal" style="display:none" role="alert">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" width="16" height="16" aria-hidden="true"><rect x="2" y="8" width="12" height="7" rx="2"/><path d="M5 8V5a3 3 0 0 1 6 0v3" stroke-linecap="round"/></svg>
+          <div>
+            <strong>Store this key securely — it will not be shown again</strong>
+            <code id="key-reveal-value" style="display:block;margin-top:6px;font-size:12px;word-break:break-all"></code>
+          </div>
+          <button class="button ghost sm" onclick="copyKey()" id="copy-key-btn">Copy</button>
+        </div>
+        <div class="table-wrap">
+          <table aria-label="API Keys" class="admin-table">
+            <thead>
+              <tr>
+                <th scope="col">Key Name</th>
+                <th scope="col">Prefix</th>
+                <th scope="col">Role</th>
+                <th scope="col">Status</th>
+                <th scope="col">Last Used</th>
+                <th scope="col">Created</th>
+              </tr>
+            </thead>
+            <tbody id="admin-keys-body"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+  </main>
+
+  <!-- ======================================================
+       FOOTER
+       ====================================================== -->
+  <footer class="app-footer" role="contentinfo">
+    <span>© 2026 UniGraph IQ Enterprise · v2.0.0 · Autonomous Product Intelligence</span>
+    <div>
+      <a href="/health" target="_blank">System Health</a>
+      <a href="/docs" target="_blank">OpenAPI Docs</a>
+      <a href="/metrics" target="_blank">Prometheus Metrics</a>
+    </div>
+  </footer>
+
+</div><!-- /.shell -->
+
+<!-- Modals -->
+
+<!-- In-line Attribute Edit / Conflict Override Modal -->
+<div id="attr-edit-modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="attr-edit-heading">
+  <div class="card login-card" style="width:min(540px,100%)">
+    <span class="kicker">Data Steward Workbench</span>
+    <h2 id="attr-edit-heading" style="margin:4px 0 12px">Edit Attribute Value</h2>
+    <form id="attr-edit-form" novalidate>
+      <input type="hidden" id="attr-edit-sku">
+      <input type="hidden" id="attr-edit-name">
+      <div class="field-row">
+        <label for="attr-edit-display-name">Attribute Name
+          <input id="attr-edit-display-name" type="text" readonly disabled style="opacity:0.8">
+        </label>
+        <label for="attr-edit-unit">Unit (Optional)
+          <input id="attr-edit-unit" type="text" placeholder="e.g. V, A, mm, psi">
+        </label>
+      </div>
+      <label for="attr-edit-value">Attribute Value
+        <input id="attr-edit-value" type="text" required placeholder="Enter normalized value">
+      </label>
+      <label for="attr-edit-comment">Steward Audit Rationale
+        <textarea id="attr-edit-comment" rows="2" placeholder="e.g. Verified against official OEM technical bulletin..."></textarea>
+      </label>
+      <button class="button wide" type="submit">Save &amp; Recalculate Golden Record</button>
+    </form>
+    <button class="text-btn" onclick="closeAttrEditModal()" style="margin-top:var(--sp-3);display:block;width:100%;text-align:center">Cancel</button>
+  </div>
+</div>
+
+<!-- Syndication Hub Modal -->
+<div id="syndication-modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="syndication-heading">
+  <div class="card login-card" style="width:min(600px,100%)">
+    <span class="kicker">Enterprise Syndication Hub</span>
+    <h2 id="syndication-heading" style="margin:4px 0 8px">Export Golden Record</h2>
+    <p class="muted" id="syndication-sku-title" style="margin-bottom:var(--sp-4)"></p>
+    <div class="syndication-options">
+      <div class="syndication-card" onclick="downloadSyndication('json')">
+        <div class="synd-icon">JSON</div>
+        <div>
+          <strong>Golden Record Master JSON</strong>
+          <small>Complete provenance, confidence scores, and source evidence chunks.</small>
+        </div>
+        <span class="text-btn">Export →</span>
+      </div>
+      <div class="syndication-card" onclick="downloadSyndication('shopify')">
+        <div class="synd-icon">CSV</div>
+        <div>
+          <strong>Shopify Product CSV</strong>
+          <small>Formatted product title, tags, HTML spec tables, and pricing structure.</small>
+        </div>
+        <span class="text-btn">Export →</span>
+      </div>
+      <div class="syndication-card" onclick="downloadSyndication('akeneo')">
+        <div class="synd-icon">PIM</div>
+        <div>
+          <strong>Akeneo / CX1 PIM JSON</strong>
+          <small>Standard enterprise PIM payload with family categories and locale scopes.</small>
+        </div>
+        <span class="text-btn">Export →</span>
+      </div>
+      <div class="syndication-card" onclick="downloadSyndication('schema_org')">
+        <div class="synd-icon">SEO</div>
+        <div>
+          <strong>Schema.org JSON-LD</strong>
+          <small>W3C structured data for search indexing and B2B eCommerce SEO.</small>
+        </div>
+        <span class="text-btn">Export →</span>
+      </div>
+      <div class="syndication-card" onclick="downloadSyndication('factsheet')">
+        <div class="synd-icon">PDF</div>
+        <div>
+          <strong>Printable Product Fact Sheet</strong>
+          <small>Interactive 1-page clean HTML technical spec sheet ready for print/PDF.</small>
+        </div>
+        <span class="text-btn">Preview →</span>
+      </div>
+    </div>
+    <button class="text-btn" onclick="closeSyndicationModal()" style="margin-top:var(--sp-4);display:block;width:100%;text-align:center">Close</button>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div id="login-modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="login-heading">
+  <div class="card login-card">
+    <span class="kicker">Enterprise Access</span>
+    <h2 id="login-heading">Sign in to UniGraph IQ</h2>
+    <form id="login-form" novalidate>
+      <label for="login-email">Email
+        <input id="login-email" name="email" type="email" value="admin@unigraph.local" required autocomplete="email">
+      </label>
+      <label for="login-password">Password
+        <input id="login-password" name="password" type="password" required autocomplete="current-password">
+      </label>
+      <button class="button wide" type="submit">Sign In</button>
+    </form>
+    <button class="text-btn" onclick="closeLogin()" style="margin-top:var(--sp-3);display:block;width:100%;text-align:center">Cancel</button>
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<div id="add-user-modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="add-user-heading">
+  <div class="card login-card">
+    <span class="kicker">Access Control</span>
+    <h2 id="add-user-heading">Add New User</h2>
+    <form id="add-user-form" novalidate>
+      <div class="field-row">
+        <label for="new-user-name">Full Name <input id="new-user-name" type="text" required placeholder="Jane Smith"></label>
+        <label for="new-user-email">Email <input id="new-user-email" type="email" required placeholder="jane@company.com" autocomplete="off"></label>
+      </div>
+      <div class="field-row">
+        <label for="new-user-role">Role
+          <select id="new-user-role" required>
+            <option value="viewer">Viewer</option>
+            <option value="product_manager">Product Manager</option>
+            <option value="data_steward">Data Steward</option>
+            <option value="compliance">Compliance</option>
+            <option value="integration">Integration</option>
+            <option value="admin">Admin</option>
+          </select>
+        </label>
+        <label for="new-user-password">Password <input id="new-user-password" type="password" required placeholder="Min 8 characters" autocomplete="new-password"></label>
+      </div>
+      <button class="button wide" type="submit">Create User</button>
+    </form>
+    <button class="text-btn" onclick="closeAddUser()" style="margin-top:var(--sp-3);display:block;width:100%;text-align:center">Cancel</button>
+  </div>
+</div>
+
+<!-- Generate API Key Modal -->
+<div id="gen-key-modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="gen-key-heading">
+  <div class="card login-card">
+    <span class="kicker">Machine Integration</span>
+    <h2 id="gen-key-heading">Generate API Key</h2>
+    <form id="gen-key-form" novalidate>
+      <div class="field-row">
+        <label for="key-name">Key Name <input id="key-name" type="text" required placeholder="e.g. ERP Integration"></label>
+        <label for="key-role">Role
+          <select id="key-role">
+            <option value="integration">Integration</option>
+            <option value="viewer">Viewer (read-only)</option>
+            <option value="data_steward">Data Steward</option>
+          </select>
+        </label>
+      </div>
+      <button class="button wide" type="submit">Generate Key</button>
+    </form>
+    <button class="text-btn" onclick="closeGenerateKey()" style="margin-top:var(--sp-3);display:block;width:100%;text-align:center">Cancel</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" role="alert" aria-live="assertive" aria-atomic="true"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

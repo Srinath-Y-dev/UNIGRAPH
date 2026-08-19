@@ -1,0 +1,10 @@
+Manufacturer: DemoFlow Industrial
+MPN: BV-050-SS304
+Product: Two-piece stainless steel ball valve
+Port Size: 1/2 in
+Body Material: Stainless Steel 304
+Pressure Rating: 600 PSI
+Connection Type: NPT Threaded
+Temperature Rating: 180 C
+Seat Material: PTFE
+Compliance: CE, RoHS

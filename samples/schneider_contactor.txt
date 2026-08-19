@@ -1,0 +1,12 @@
+Manufacturer: Schneider Electric
+MPN: LC1D18M7-DEMO
+Product: IEC Contactor for industrial motor control
+Number of poles: 3
+Current Rating: 18 A
+Coil Voltage: 220 VAC
+Frequency: 50 Hz
+Mounting Type: DIN Rail
+Operating Temperature: -5 to 60 C
+IP20
+Compliance: CE, RoHS, REACH
+This sample record is synthetic and provided only to demonstrate UniGraph IQ.
