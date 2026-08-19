@@ -66,13 +66,18 @@
         </button>
       </div>
 
-      <!-- Theme Switcher & Status -->
+      <!-- Quick Search / Command Palette & Theme -->
       <div class="nav-status" aria-label="System status">
+        <button class="cmd-trigger-btn" onclick="openCmdPalette()" title="Search catalog or jump to views (Ctrl+K)" aria-label="Open Command Palette">
+          <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>
+          <span>Search...</span>
+          <kbd>Ctrl+K</kbd>
+        </button>
         <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle Theme" aria-label="Toggle light/dark theme">
           <svg class="sun-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         </button>
         <div class="status-dot" aria-hidden="true"></div>
-        <span>AI Engine: Active</span>
+        <span>AI Active</span>
       </div>
 
       <!-- Top actions -->
@@ -838,9 +843,34 @@
   </div>
 </div>
 
+<!-- Command Palette Modal (Ctrl+K) -->
+<div id="cmd-palette-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeCmdPalette()">
+  <div class="cmd-palette-card">
+    <div class="cmd-palette-search">
+      <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8.5" cy="8.5" r="6"/><path d="M13 13l4.5 4.5"/></svg>
+      <input id="cmd-palette-input" type="text" placeholder="Type a command, SKU, product name, or view..." autocomplete="off" oninput="filterCmdPalette(this.value)">
+      <kbd>ESC</kbd>
+    </div>
+    <div id="cmd-palette-results" class="cmd-palette-results"></div>
+  </div>
+</div>
+
+<!-- Connector Live Simulation Modal -->
+<div id="simulator-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeSimulatorModal()">
+  <div class="card login-card" style="width:min(680px, 94vw)">
+    <span class="kicker">Active Connector Simulator</span>
+    <h2 style="margin:4px 0 8px">Live Webhook &amp; Payload Dispatch</h2>
+    <p class="muted" style="margin-bottom:var(--sp-3)">Inspect simulated real-time outbound payload sync, latency response, and remote API acknowledgment.</p>
+    
+    <div id="simulator-content" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--rad-md);padding:var(--sp-3);font-family:monospace;font-size:12px;max-height:360px;overflow-y:auto;white-space:pre-wrap;color:var(--txt-1)"></div>
+    <button class="button wide" style="margin-top:var(--sp-4)" onclick="closeSimulatorModal()">Done</button>
+  </div>
+</div>
+
 <!-- Toast -->
 <div id="toast" role="alert" aria-live="assertive" aria-atomic="true"></div>
 
 <script src="/static/app.js"></script>
 </body>
 </html>
+

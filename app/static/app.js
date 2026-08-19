@@ -569,6 +569,10 @@ async function renderCompareView() {
             <span class="kicker">Cross-Reference Matrix</span>
             <h3>Specification Variance &amp; Matching Analysis (${matrix.length} Parameters)</h3>
           </div>
+          <button class="button ghost sm" onclick="exportCompareCSV()">
+            <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px"><path d="M2 10v3h12v-3M8 2v8M5 7l3 3 3-3"/></svg>
+            Export Matrix CSV
+          </button>
         </div>
         <div class="table-wrap">
           <table class="compare-matrix-table">
@@ -1152,7 +1156,8 @@ function renderReview() {
         <span class="status ${statusClass(p.status)}">${statusText(p.status)}</span>
         ${p.conflict_count > 0 ? `<span style="color:var(--color-warning);font-size:12px;margin-left:8px;font-weight:700">⚠️ ${p.conflict_count} conflict(s)</span>` : ''}
       </div>
-      <div class="review-actions" style="display:flex;gap:6px">
+      <div class="review-actions" style="display:flex;gap:6px;align-items:center">
+        ${p.conflict_count > 0 ? `<button class="button sm" style="background:var(--color-primary);font-size:11px" onclick="autoResolveProduct('${esc(p.sku)}')">⚡ Auto-Resolve</button>` : ''}
         <button class="button ghost sm" onclick="openProduct('${esc(p.sku)}')">Inspect</button>
         <button class="button sm" style="background:var(--color-success)" onclick="openReviewModal('${esc(p.sku)}', 'APPROVE')">Approve</button>
         <button class="button sm" style="background:var(--color-danger)" onclick="openReviewModal('${esc(p.sku)}', 'REJECT')">Reject</button>
@@ -1371,6 +1376,7 @@ function renderConnectors(connectors) {
       <div style="display:flex;gap:6px;align-items:center">
         <span class="status ready">${esc(x.status)}</span>
         <button class="button ghost sm" onclick="testConnector('${esc(x.name)}')">Ping Test</button>
+        <button class="button sm" style="background:var(--color-primary);font-size:11px" onclick="simulateConnector(${x.id})">⚡ Simulate Sync</button>
       </div>
     </div>
   `).join('') || '<p class="muted">No connectors configured.</p>';
@@ -1529,6 +1535,165 @@ async function deactivateUser(id) {
 }
 
 /* ============================================================
+   COMMAND PALETTE (CTRL+K) & ADVANCED ACTIONS
+   ============================================================ */
+function openCmdPalette() {
+  const modal = $('#cmd-palette-modal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  const input = $('#cmd-palette-input');
+  if (input) {
+    input.value = '';
+    input.focus();
+    filterCmdPalette('');
+  }
+}
+
+function closeCmdPalette() {
+  const modal = $('#cmd-palette-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function filterCmdPalette(query) {
+  const q = (query || '').toLowerCase().trim();
+  const res = $('#cmd-palette-results');
+  if (!res) return;
+
+  const views = [
+    { name: 'Command Center', view: 'dashboard', icon: '📊' },
+    { name: 'Enrich Product', view: 'enrich', icon: '⚡' },
+    { name: 'Catalog Records', view: 'catalog', icon: '📦' },
+    { name: 'Comparison Matrix', view: 'compare', icon: '⚖️' },
+    { name: 'Review & QA Queue', view: 'review', icon: '🛡️' },
+    { name: 'Catalog Intelligence Copilot', view: 'copilot', icon: '🤖' },
+    { name: 'Operations & Batch Jobs', view: 'operations', icon: '⚙️' },
+    { name: 'Enterprise & PIM Connectors', view: 'enterprise', icon: '🏢' },
+  ];
+
+  const matchedViews = views.filter(v => !q || v.name.toLowerCase().includes(q) || v.view.includes(q));
+  const matchedProducts = (state.products || []).filter(p => 
+    !q ||
+    p.sku.toLowerCase().includes(q) || 
+    (p.manufacturer && p.manufacturer.toLowerCase().includes(q)) ||
+    (p.category && p.category.toLowerCase().includes(q)) ||
+    (p.mpn && p.mpn.toLowerCase().includes(q))
+  ).slice(0, 8);
+
+  let html = '';
+  if (matchedViews.length > 0) {
+    html += `<div class="cmd-group-title">Navigation Views</div>`;
+    html += matchedViews.map(v => `
+      <div class="cmd-item" onclick="showView('${v.view}');closeCmdPalette()">
+        <div class="cmd-item-left">
+          <span class="cmd-item-icon">${v.icon}</span>
+          <span>${esc(v.name)}</span>
+        </div>
+        <span class="cmd-item-badge">Jump</span>
+      </div>
+    `).join('');
+  }
+
+  if (matchedProducts.length > 0) {
+    html += `<div class="cmd-group-title">Products &amp; Golden Records</div>`;
+    html += matchedProducts.map(p => `
+      <div class="cmd-item" onclick="openProductDetail('${esc(p.sku)}');closeCmdPalette()">
+        <div class="cmd-item-left">
+          <span class="cmd-item-icon">📦</span>
+          <div>
+            <strong>${esc(p.sku)}</strong>
+            <span class="muted" style="margin-left:6px;font-size:11px">${esc(p.manufacturer || '')} · ${esc(p.category || '')}</span>
+          </div>
+        </div>
+        <span class="status ${statusClass(p.status)}" style="font-size:10px">${statusText(p.status)}</span>
+      </div>
+    `).join('');
+  }
+
+  if (!html) {
+    html = `<div style="padding:2rem;text-align:center;color:var(--color-text-muted)">No matching commands or products found for "${esc(query)}"</div>`;
+  }
+  res.innerHTML = html;
+}
+
+// Global hotkeys
+window.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    const modal = $('#cmd-palette-modal');
+    if (modal && modal.style.display === 'flex') closeCmdPalette();
+    else openCmdPalette();
+  } else if (e.key === 'Escape') {
+    closeCmdPalette();
+    closeSimulatorModal();
+  }
+});
+
+async function autoResolveProduct(sku) {
+  if (!confirm(`Auto-resolve all attribute conflicts for SKU "${sku}" using highest-authority source voting?`)) return;
+  try {
+    const res = await api(`/api/products/${sku}/auto-resolve`, { method: 'POST' });
+    toast(res.message || 'Conflicts resolved successfully');
+    await load();
+    if (state.currentProduct && state.currentProduct.sku === sku) {
+      openProductDetail(sku);
+    }
+  } catch (err) {
+    toast('Failed to auto-resolve conflicts');
+  }
+}
+
+async function simulateConnector(connectorId) {
+  try {
+    toast('Dispatching simulated outbound webhook...');
+    const sku = (state.products && state.products[0]) ? state.products[0].sku : 'UGI-CONTACTOR-001';
+    const res = await api(`/api/connectors/${connectorId}/simulate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sku })
+    });
+    
+    $('#simulator-content').textContent = JSON.stringify(res, null, 2);
+    $('#simulator-modal').style.display = 'flex';
+    toast(`Sync simulated in ${res.latency_ms}ms (HTTP ${res.http_code})`);
+  } catch (err) {
+    toast('Simulation failed');
+  }
+}
+
+function closeSimulatorModal() {
+  const modal = $('#simulator-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function exportCompareCSV() {
+  const skus = Array.from(state.selectedCompareSkus);
+  if (skus.length < 2) {
+    toast('Select at least 2 products to export comparison');
+    return;
+  }
+  const table = document.querySelector('.compare-matrix-table');
+  if (!table) return;
+  let csvRows = [];
+  const headers = [...table.querySelectorAll('thead th')].map(th => `"${th.innerText.replace(/"/g, '""').trim()}"`);
+  csvRows.push(headers.join(','));
+
+  table.querySelectorAll('tbody tr').forEach(tr => {
+    const row = [...tr.querySelectorAll('td')].map(td => `"${td.innerText.replace(/"/g, '""').trim()}"`);
+    csvRows.push(row.join(','));
+  });
+
+  const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `unigraph_comparison_${skus.join('_')}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  toast('Comparison Matrix CSV exported');
+}
+
+/* ============================================================
    AUTH IDENTITY
    ============================================================ */
 $('#login-form')?.addEventListener('submit', async e => {
@@ -1565,3 +1730,4 @@ async function loadIdentity() {
    ============================================================ */
 load().catch(console.error);
 loadIdentity();
+

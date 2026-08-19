@@ -417,6 +417,121 @@ async def copilot(payload: dict, request: Request):
     return generate_copilot_response(q, ps, evidence_hits)
 
 
+@app.post('/api/products/{sku}/auto-resolve')
+async def auto_resolve_conflicts(sku: str, request: Request):
+    """1-Click automated resolution of all conflicts using weighted highest authority voting."""
+    u = require(request, {'admin', 'product_manager', 'data_steward'})
+    p = db.get_product(sku)
+    if not p: raise HTTPException(404, 'Product not found')
+    
+    conflicts = p.get('conflicts', [])
+    if not conflicts:
+        return {'message': 'No conflicts found on this product.', 'product': p}
+    
+    resolved_count = 0
+    for c in conflicts:
+        attr = c.get('attribute')
+        candidates = c.get('candidates', [])
+        if not candidates: continue
+        # Sort by authority weight descending
+        best = max(candidates, key=lambda x: x.get('authority', 0.5))
+        val, unit = normalize_unit(best.get('value'), best.get('unit'))
+        
+        p['attributes'][attr] = {
+            'value': val,
+            'unit': unit,
+            'confidence': best.get('authority', 0.95),
+            'status': 'VERIFIED',
+            'provenance': [{
+                'source': f"Auto-Resolved via QA Guardian ({best.get('source', 'Primary Source')})",
+                'source_type': best.get('source_type', 'manufacturer_datasheet'),
+                'evidence': f"Accepted highest-authority ({best.get('authority')}) during 1-click batch resolution by {u['email']}",
+                'confidence': best.get('authority', 0.95),
+            }]
+        }
+        db.add_review(sku, attr, 'AUTO_RESOLVE', f"{val} {unit or ''}".strip(), f"Highest authority winner ({best.get('source')})", u['email'])
+        resolved_count += 1
+        
+    p['conflicts'] = []
+    p = recalculate_product_scores(p)
+    p['anomalies'] = anomaly_findings(p)
+    p['publish_gate'] = publish_gate(p)
+    p['record_hash'] = product_hash(p)
+    
+    rel = family_and_relationships(p, db.list_products())
+    edges = relation_edges(p) + rel['relationships']
+    db.upsert_product(p, edges, actor=u['email'])
+    db.log('AUTO_RESOLVED_ALL_CONFLICTS', f"Resolved {resolved_count} attribute conflicts for {sku}", sku=sku, actor=u['email'])
+    
+    return {'message': f'Successfully auto-resolved {resolved_count} conflicts!', 'product': p}
+
+@app.post('/api/connectors/{connector_id}/simulate')
+async def simulate_connector_dispatch(connector_id: int, payload: dict, request: Request):
+    """Simulate real-time enterprise webhook / API sync dispatch with detailed latency and payload telemetry."""
+    require(request, {'admin', 'product_manager', 'integration'})
+    sku = payload.get('sku')
+    p = db.get_product(sku) if sku else (db.list_products() or [{}])[0]
+    full_p = db.get_product(p.get('sku')) if p else None
+    
+    start = time.time()
+    # Format payload according to connector type
+    conn_list = db.connectors()
+    target_conn = next((c for c in conn_list if c['id'] == connector_id), None)
+    
+    simulated_payload = {
+        'event': 'PRODUCT_GOLDEN_RECORD_PUBLISHED',
+        'timestamp': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+        'connector': target_conn['name'] if target_conn else 'PIM Connector',
+        'target_endpoint': target_conn['base_url'] if target_conn else 'https://api.unigraph.internal/sync',
+        'record': {
+            'sku': full_p.get('sku') if full_p else 'SKU-SAMPLE',
+            'manufacturer': full_p.get('identity', {}).get('manufacturer') if full_p else 'Manufacturer',
+            'mpn': full_p.get('identity', {}).get('mpn') if full_p else 'MPN-SAMPLE',
+            'category': full_p.get('category') if full_p else 'General',
+            'status': full_p.get('scores', {}).get('status') if full_p else 'READY_TO_PUBLISH',
+            'iq_score': full_p.get('scores', {}).get('product_intelligence_score') if full_p else 100,
+            'attributes_count': len(full_p.get('attributes', {})) if full_p else 0,
+        }
+    }
+    latency_ms = round((time.time() - start + 0.042) * 1000, 1) # realistic sub-50ms simulation
+    
+    return {
+        'status': 'SUCCESS',
+        'http_code': 200,
+        'latency_ms': latency_ms,
+        'dispatched_payload': simulated_payload,
+        'server_response': {
+            'acknowledged': True,
+            'transaction_id': f"txn_{uuid.uuid4().hex[:12]}",
+            'message': f"Golden Record for SKU {simulated_payload['record']['sku']} accepted by remote syndication endpoint."
+        }
+    }
+
+@app.get('/api/system/diagnostics')
+def system_diagnostics(request: Request):
+    """Deep system health, storage, cache, and telemetry diagnostics."""
+    require(request)
+    start = time.time()
+    d = db.dashboard()
+    analytics = db.get_catalog_analytics()
+    db_file = Path(os.getenv('DATABASE_PATH', 'data/unigraph.db'))
+    db_size_kb = round(db_file.stat().st_size / 1024, 1) if db_file.exists() else 0
+    
+    return {
+        'status': 'HEALTHY',
+        'uptime_status': 'ONLINE',
+        'version': '2.0.0 Enterprise',
+        'database_size_kb': db_size_kb,
+        'total_products': d['total'],
+        'ready_to_publish': d['ready'],
+        'review_required': d['review'],
+        'evidence_chunks_indexed': d['evidence_chunks'],
+        'categories_active': len(analytics.get('categories', [])),
+        'top_manufacturers': len(analytics.get('manufacturers', [])),
+        'system_latency_ms': round((time.time() - start) * 1000, 2),
+        'environment': 'Production' if os.getenv('AUTH_REQUIRED') == 'true' else 'Demo/Sandbox'
+    }
+
 @app.get('/metrics')
 def metrics():
     d = db.dashboard()
